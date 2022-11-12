@@ -38,6 +38,47 @@ def process_file(fileName):
     return word, senses, ranges
 
 
+def define_folds(fileName, ranges, word):
+    # First fold
+    foldOneidTest = []
+    foldOneidTrain = []
+    startROne = 0
+    endROne = startROne + ranges[0]
+    # Second fold
+    foldTwoidTest = []
+    foldTwoidTrain = []
+    startRTwo = ranges[0]
+    endRTwo = startRTwo + ranges[1]
+    # Third fold
+    foldThreeidTest = []
+    foldThreeidTrain = []
+    startRThree = ranges[0] + ranges[1]
+    endRThree = startRThree + ranges[2]
+    # Fourth fold
+    foldFouridTest = []
+    foldFouridTrain = []
+    startRFour = ranges[0] + ranges[1] + ranges[2]
+    endRFour = startRFour + ranges[3]
+    # Fifth fold
+    foldFiveidTest = []
+    foldFiveidTrain = []
+    startRFive = ranges[0] + ranges[1] + ranges[2] + ranges[3]
+    endRFive = startRFive + ranges[4]
+
+    count = 0
+    with open(fileName, 'r') as inputFile:
+        # Grabbing each line
+        for line in inputFile:
+            # Checks if the line begins with answer (since these lines have the sense of the word)
+            if line.startswith("<answer"):
+
+                identificationNumber = line[line.find(word + '.') + len(word) + 1:line.find('" senseid')]
+                # Grabs the id for each instance
+                if startROne <= count < endROne:
+                    foldOneidTest.append(identificationNumber)
+            count += 1
+
+
 # Grab all the necessary counts from the training sections of the file per fold
 def process_train(fileName, word, senses, ranges, startRange, endRange):
     # Counts of each sense
@@ -56,17 +97,11 @@ def process_train(fileName, word, senses, ranges, startRange, endRange):
     # Default punctuation list from the string class, to remove punctuation from words
     punctuation_list = list(string.punctuation)
 
-    # Counter for ranges
-    counter = 0
-
     # Boolean to check if the line is the line with the sentence
     sentenceLine = False
     with open(fileName, 'r') as inputFile:
         # Grabbing each line
         for line in inputFile:
-            # Ensures that the test set range is skipped when determining the counts
-            if startRange <= counter < endRange:
-                continue
             # Checks if the line begins with answer (since these lines have the sense of the word)
             if line.startswith("<answer"):
                 # Grabs the sense for each instance
@@ -79,7 +114,6 @@ def process_train(fileName, word, senses, ranges, startRange, endRange):
                 continue
             # If the sentence line is encountered, we gather the word counts per sense
             if sentenceLine:
-                counter += 1
                 sentenceLine = False
                 # Split line by space delimiter into an array
                 eachLine = line.split()
@@ -118,23 +152,24 @@ if len(sys.argv) >= 2:
     arg = sys.argv[1]
 
 # Process the input file
-wordMain, sensesMain, rangesMain = process_file(arg)
-for fold in range(len(rangesMain)):
-    startR = 0
-    endR = 0
-    if fold == 0:
-        startR = 0
-        endR = startR + rangesMain[fold]
-    elif fold == 1:
-        startR = rangesMain[0]
-        endR = startR + rangesMain[fold]
-    elif fold == 2:
-        startR = rangesMain[0] + rangesMain[1]
-        endR = startR + rangesMain[fold]
-    elif fold == 3:
-        startR = rangesMain[0] + rangesMain[1] + rangesMain[2]
-        endR = startR + rangesMain[fold]
-    elif fold == 4:
-        startR = rangesMain[0] + rangesMain[1] + rangesMain[2] + rangesMain[3]
-        endR = startR + rangesMain[fold]
-    systemPrediction = process_train(arg, wordMain, sensesMain, rangesMain, startR, endR)
+wordMain, sensesMain, rangesM = process_file(arg)
+define_folds(arg, rangesM, wordMain)
+for foldm in range(len(rangesM)):
+    startRm = 0
+    endRm = 0
+    if foldm == 0:
+        startRm = 0
+        endRm = startRm + rangesM[foldm]
+    elif foldm == 1:
+        startRm = rangesM[0]
+        endRm = startRm + rangesM[foldm]
+    elif foldm == 2:
+        startRm = rangesM[0] + rangesM[1]
+        endRm = startRm + rangesM[foldm]
+    elif foldm == 3:
+        startRm = rangesM[0] + rangesM[1] + rangesM[2]
+        endRm = startRm + rangesM[foldm]
+    elif foldm == 4:
+        startRm = rangesM[0] + rangesM[1] + rangesM[2] + rangesM[3]
+        endRm = startRm + rangesM[foldm]
+    systemPrediction = process_train(arg, wordMain, sensesMain, rangesM, startRm, endRm)
