@@ -1,0 +1,103 @@
+# Program Completeness for all files
+My program is complete and runs. However, my accuracy numbers seem off and I can't seem to figure out why.
+For example, my plant.wsd.out file has everything tagged as sense factory.
+I have debugged multiple times and double checked numbers so I'm not sure what is wrong.
+
+plant.wsd
+Fold One
+Accuracy: 63.16
+Fold Two
+Accuracy: 63.16
+Fold Three
+Accuracy: 55.26
+Fold Four
+Accuracy: 60.53
+Fold Five
+Accuracy: 27.78
+Total Accuracy: 54.26
+
+# Three errors
+All of my sense tagged data in plant is showing up as factory in my out file (not sure why).
+
+Error 1)
+Plant ID plant.1000153
+The gold standard is 'living' but my program is determining factory
+Assuming that there are no mathematical errors, one way in fixing an error like this is choosing key words as features
+rather than using all words in the dataset as features. For example, workers for factory and spring for living.
+
+Error 2)
+Plant ID plant.1000155
+The gold standard is 'living' but my program is determining factory
+Assuming that there are no mathematical errors, one way in fixing an error like this is having more equal data. Living
+and factory should occur around the same amount. In this dataset living occurs 86 times while factory occurs 102 times.
+
+Error 3)
+Plant ID plant.1000163
+The gold standard is 'living' but my program is determining factory
+Assuming that there are no mathematical errors, one way in fixing an error like this might be getting rid of the use of
+stop words to have more accurate data.
+
+palm.wsd
+Fold One
+Accuracy: 65.85
+Fold Two
+Accuracy: 73.17
+Fold Three
+Accuracy: 63.41
+Fold Four
+Accuracy: 80.49
+Fold Five
+Accuracy: 72.97
+Total Accuracy: 71.14
+
+motion.wsd
+Fold One
+Accuracy: 48.78
+Fold Two
+Accuracy: 58.54
+Fold Three
+Accuracy: 90.24
+Fold Four
+Accuracy: 80.49
+Fold Five
+Accuracy: 75.68
+Total Accuracy: 70.65
+
+crane.wsd
+Fold One
+Accuracy: 68.42
+Fold Two
+Accuracy: 73.68
+Fold Three
+Accuracy: 73.68
+Fold Four
+Accuracy: 78.95
+Fold Five
+Accuracy: 84.21
+Total Accuracy: 75.79
+
+tank.wsd
+Fold One
+Accuracy: 56.10
+Fold Two
+Accuracy: 68.29
+Fold Three
+Accuracy: 78.05
+Fold Four
+Accuracy: 80.49
+Fold Five
+Accuracy: 27.03
+Total Accuracy: 62.69
+
+bass.wsd
+Fold One
+Accuracy: 72.73
+Fold Two
+Accuracy: 95.45
+Fold Three
+Accuracy: 90.91
+Fold Four
+Accuracy: 100.00
+Fold Five
+Accuracy: 94.74
+Total Accuracy: 90.65

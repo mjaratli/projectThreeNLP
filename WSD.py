@@ -148,9 +148,9 @@ def naivebayes(fileName, sensesDict, senseOneWord, senseTwoWord, sensesUniqueDic
                     item = item.lower()
                     # Naive Bayes calculation
                     numeratorOne = senseOneWord.get(item, 0) + 1
-                    denominatorOne = sensesDict[senses[0]] + sensesUniqueDict[senses[0]]
+                    denominatorOne = sensesDict[senses[0]] + sensesUniqueDict[senses[0]] + sensesUniqueDict[senses[1]]
                     numeratorTwo = senseTwoWord.get(item, 0) + 1
-                    denominatorTwo = sensesDict[senses[1]] + sensesUniqueDict[senses[1]]
+                    denominatorTwo = sensesDict[senses[1]] + sensesUniqueDict[senses[1]] + sensesUniqueDict[senses[0]]
                     senseOneCalculation += math.log2((numeratorOne/denominatorOne) + 1)
                     senseTwoCalculation += math.log2((numeratorTwo/denominatorTwo) + 1)
                 totalSenses = sensesDict[senses[0]] + sensesDict[senses[1]]
