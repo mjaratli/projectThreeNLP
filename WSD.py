@@ -110,8 +110,61 @@ def process_train(fileName, word, senses, ranges, startRange, endRange, sentence
     return sensesDict, senseOneWord, senseTwoWord, sensesUniqueDict
 
 
-def naivebayes(sensesDict, sensesOneWord, sensesTwoWord, sensesUniqueDict):
-    hi = 5
+def naivebayes(fileName, sensesDict, senseOneWord, senseTwoWord, sensesUniqueDict, word, startRange,
+               endRange, sentences, senses):
+    # Accuracy number
+    accuracyNum = 0
+    # ID list
+    sensesID = []
+    # Sense predicted list
+    sensesPredicted = []
+    # Counter
+    counter = -1
+    # Default punctuation list from the string class, to remove punctuation from words
+    punctuation_list = list(string.punctuation)
+    with open(fileName, 'r') as inputFile:
+        # Grabbing each line
+        for line in inputFile:
+            # Checks if the line begins with answer (since these lines have the sense of the word)
+            if line.startswith("<answer"):
+                # Each time answer is encountered it is a new instance, so we add to counter here
+                counter += 1
+                if not (startRange <= counter < endRange):
+                    continue
+                # Grabs the sense for each instance
+                sense = line[line.find(word + '%') + len(word) + 1:line.find('"/>')]
+                # Grabs the ID
+                ID = line[line.find(word + '.') + len(word) + 1:line.find('" sense')]
+                # Grabs the line from the sentences array based on counter
+                # Also splits line by space delimiter into an array
+                eachLine = sentences[counter].split()
+                senseOneCalculation = 0
+                senseTwoCalculation = 0
+                for item in eachLine:
+                    # Remove punctuation from words
+                    for element in punctuation_list:
+                        item = item.replace(element, "")
+                    # Lowercase all words
+                    item = item.lower()
+                    # Naive Bayes calculation
+                    numeratorOne = senseOneWord.get(item, 0) + 1
+                    denominatorOne = sensesDict[senses[0]] + sensesUniqueDict[senses[0]]
+                    numeratorTwo = senseTwoWord.get(item, 0) + 1
+                    denominatorTwo = sensesDict[senses[1]] + sensesUniqueDict[senses[1]]
+                    senseOneCalculation += math.log2((numeratorOne/denominatorOne) + 1)
+                    senseTwoCalculation += math.log2((numeratorTwo/denominatorTwo) + 1)
+                totalSenses = senses[0] + senses[1]
+                senseOneCalculation += math.log2((senses[0]/totalSenses) + 1)
+                senseTwoCalculation += math.log2((senses[1] / totalSenses) + 1)
+                if senseOneCalculation > senseTwoCalculation:
+                    systemSense = senses[0]
+                else:
+                    systemSense = senses[1]
+                sensesID.append(ID)
+                sensesPredicted.append(systemSense)
+                if systemSense == sense:
+                    accuracyNum += 1
+    return sensesID, sensesPredicted, accuracyNum
 
 
 # Grabbing the file name from the terminal as an argument
@@ -120,26 +173,50 @@ arg = " "
 if len(sys.argv) >= 2:
     arg = sys.argv[1]
 
+# To grab the avg accuracy of all folds
+totalAccuracyNum = 0
+
 # Process the input file
 wordMain, sensesMain, rangesM, sentenceList = process_file(arg)
-for foldm in range(len(rangesM)):
-    startRm = 0
-    endRm = 0
-    if foldm == 0:
+# Write to outFile predicted results for POS.test
+with open(wordMain + '.wsd.out', 'w') as out_file:
+    foldNum = ''
+    accur
+    for foldm in range(len(rangesM)):
         startRm = 0
-        endRm = startRm + rangesM[foldm]
-    elif foldm == 1:
-        startRm = rangesM[0]
-        endRm = startRm + rangesM[foldm]
-    elif foldm == 2:
-        startRm = rangesM[0] + rangesM[1]
-        endRm = startRm + rangesM[foldm]
-    elif foldm == 3:
-        startRm = rangesM[0] + rangesM[1] + rangesM[2]
-        endRm = startRm + rangesM[foldm]
-    elif foldm == 4:
-        startRm = rangesM[0] + rangesM[1] + rangesM[2] + rangesM[3]
-        endRm = startRm + rangesM[foldm]
-    sensesDictM, sensesOneWordM, sensesTwoWordM, sensesUniqueDictM = \
-        process_train(arg, wordMain, sensesMain, rangesM, startRm, endRm, sentenceList)
+        endRm = 0
+        if foldm == 0:
+            startRm = 0
+            endRm = startRm + rangesM[foldm]
+            foldNum = 'Fold One'
+        elif foldm == 1:
+            startRm = rangesM[0]
+            endRm = startRm + rangesM[foldm]
+            foldNum = 'Fold Two'
+        elif foldm == 2:
+            startRm = rangesM[0] + rangesM[1]
+            endRm = startRm + rangesM[foldm]
+            foldNum = 'Fold Three'
+        elif foldm == 3:
+            startRm = rangesM[0] + rangesM[1] + rangesM[2]
+            endRm = startRm + rangesM[foldm]
+            foldNum = 'Fold Four'
+        elif foldm == 4:
+            startRm = rangesM[0] + rangesM[1] + rangesM[2] + rangesM[3]
+            endRm = startRm + rangesM[foldm]
+            foldNum = 'Fold Five'
+        sensesDictM, sensesOneWordM, sensesTwoWordM, sensesUniqueDictM = \
+            process_train(arg, wordMain, sensesMain, rangesM, startRm, endRm, sentenceList)
+        sensesIDM, sensesPredictedM, accuracyNumM = \
+            naivebayes(arg, sensesDictM, sensesOneWordM, sensesTwoWordM, sensesUniqueDictM, wordMain, startRm, endRm, sentenceList, sensesMain)
+
+        out_file.write(foldNum + '\n')
+        for index in range(0, len(sensesIDM)):
+            out_file.write(wordMain + '.' + sensesIDM[index] + ' ' + wordMain + '%' + sensesPredictedM[index] + '\n')
+
+        print(foldNum + '\n')
+        print('Accuracy: ' + )
+
+
+
 
