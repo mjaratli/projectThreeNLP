@@ -48,7 +48,7 @@ def process_file(fileName):
     ranges.append(instances - (ranges[0] + ranges[1] + ranges[2] + ranges[3]))
 
     # Returns the word, the possible senses, and the ranges for all the folds
-    return word, senses, ranges, sentences
+    return word, senses, ranges, sentences, instances
 
 
 # Grab all the necessary counts from the training sections of the file per fold
@@ -153,9 +153,9 @@ def naivebayes(fileName, sensesDict, senseOneWord, senseTwoWord, sensesUniqueDic
                     denominatorTwo = sensesDict[senses[1]] + sensesUniqueDict[senses[1]]
                     senseOneCalculation += math.log2((numeratorOne/denominatorOne) + 1)
                     senseTwoCalculation += math.log2((numeratorTwo/denominatorTwo) + 1)
-                totalSenses = senses[0] + senses[1]
-                senseOneCalculation += math.log2((senses[0]/totalSenses) + 1)
-                senseTwoCalculation += math.log2((senses[1] / totalSenses) + 1)
+                totalSenses = sensesDict[senses[0]] + sensesDict[senses[1]]
+                senseOneCalculation += math.log2((sensesDict[senses[0]]/totalSenses) + 1)
+                senseTwoCalculation += math.log2((sensesDict[senses[1]]/totalSenses) + 1)
                 if senseOneCalculation > senseTwoCalculation:
                     systemSense = senses[0]
                 else:
@@ -177,11 +177,11 @@ if len(sys.argv) >= 2:
 totalAccuracyNum = 0
 
 # Process the input file
-wordMain, sensesMain, rangesM, sentenceList = process_file(arg)
+wordMain, sensesMain, rangesM, sentenceList, instanceTotal = process_file(arg)
 # Write to outFile predicted results for POS.test
 with open(wordMain + '.wsd.out', 'w') as out_file:
     foldNum = ''
-    accur
+    accuracyTotal = 0
     for foldm in range(len(rangesM)):
         startRm = 0
         endRm = 0
@@ -214,8 +214,15 @@ with open(wordMain + '.wsd.out', 'w') as out_file:
         for index in range(0, len(sensesIDM)):
             out_file.write(wordMain + '.' + sensesIDM[index] + ' ' + wordMain + '%' + sensesPredictedM[index] + '\n')
 
-        print(foldNum + '\n')
-        print('Accuracy: ' + )
+        print(foldNum)
+        print(f"Accuracy: {(accuracyNumM/rangesM[foldm]) * 100:.2f}" + '\n')
+
+        accuracyTotal += accuracyNumM
+
+    print(f"Total Accuracy: {(accuracyTotal/instanceTotal) * 100:.2f}")
+
+
+
 
 
 
